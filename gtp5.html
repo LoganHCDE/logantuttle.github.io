@@ -1,0 +1,688 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>// portfolio :: access granted</title>
+    <meta
+      name="description"
+      content="Retro-futuristic hacker terminal portfolio"
+    />
+
+    <!-- Roboto Mono -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --green: #00ff41;
+        --green-soft: #9effc1;
+        --bg-dark: #070a12;
+        --bg-med: #111827;
+        --danger: #ff3c3c;
+
+        --text: var(--green);
+        --panel: rgba(17, 24, 39, 0.55);
+        --blur: 10px;
+
+        --corner: 3px;
+        --radius: 6px;
+
+        --shadow-glow: 0 0 8px rgba(0, 255, 65, 0.6),
+          0 0 18px rgba(0, 255, 65, 0.25);
+
+        --scanlines: repeating-linear-gradient(
+          to bottom,
+          rgba(0, 0, 0, 0) 0px,
+          rgba(0, 0, 0, 0) 2px,
+          rgba(0, 255, 65, 0.06) 3px,
+          rgba(0, 0, 0, 0) 4px
+        );
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        font-family: 'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, Monaco,
+          Consolas, 'Liberation Mono', 'Courier New', monospace;
+        color: var(--text);
+        background: var(--bg-dark);
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+
+      /* Matrix canvas full screen */
+      #matrix-rain {
+        position: fixed;
+        inset: 0;
+        z-index: -2;
+        background: radial-gradient(
+            1200px 600px at 70% -10%,
+            rgba(0, 255, 65, 0.05),
+            transparent 60%
+          ),
+          #03050a;
+      }
+
+      /* Subtle screen overlay */
+      .screen-overlay {
+        pointer-events: none;
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        background: linear-gradient(
+            0deg,
+            rgba(0, 255, 65, 0.05),
+            rgba(0, 255, 65, 0.02)
+          ),
+          radial-gradient(
+            500px 250px at 20% -10%,
+            rgba(0, 255, 65, 0.08),
+            transparent 70%
+          );
+        mix-blend-mode: screen;
+      }
+
+      /* Boot sequence */
+      .boot {
+        position: fixed;
+        inset: 0;
+        background: #000c;
+        backdrop-filter: blur(2px);
+        display: grid;
+        place-items: center;
+        z-index: 50;
+      }
+
+      .boot-inner {
+        width: min(780px, 92vw);
+        background: rgba(7, 10, 18, 0.9);
+        border: 1px solid rgba(0, 255, 65, 0.25);
+        padding: 24px;
+        box-shadow: var(--shadow-glow);
+      }
+
+      .boot-log {
+        margin: 0 0 14px 0;
+        color: var(--green-soft);
+        min-height: 180px;
+        white-space: pre-wrap;
+      }
+
+      .boot-progress {
+        height: 6px;
+        background: rgba(0, 255, 65, 0.08);
+        overflow: hidden;
+      }
+      .boot-progress .bar {
+        width: 0%;
+        height: 100%;
+        background: var(--green);
+        box-shadow: var(--shadow-glow);
+        transition: width 0.2s linear;
+      }
+
+      /* Header / Nav */
+      .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        backdrop-filter: blur(6px);
+        background: rgba(7, 10, 18, 0.65);
+        border-bottom: 1px solid rgba(0, 255, 65, 0.12);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 14px 24px;
+      }
+
+      .logo {
+        color: var(--text);
+        text-decoration: none;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-shadow: var(--shadow-glow);
+      }
+
+      .site-nav {
+        display: flex;
+        gap: 24px;
+      }
+      .nav-link {
+        color: var(--text);
+        text-decoration: none;
+        font-weight: 500;
+        letter-spacing: 1px;
+      }
+      .nav-link:hover,
+      .nav-link:focus-visible {
+        color: var(--green-soft);
+        text-shadow: var(--shadow-glow);
+      }
+      .nav-link.active {
+        color: var(--green-soft);
+        text-shadow: var(--shadow-glow);
+      }
+
+      .content {
+        width: min(1200px, 92vw);
+        margin: 28px auto 64px;
+      }
+
+      .section {
+        margin: 28px 0;
+        padding: 24px;
+      }
+
+      /* Panels with blur and corners */
+      .ui-panel {
+        background: var(--panel);
+        backdrop-filter: blur(var(--blur));
+        border-radius: var(--radius);
+        position: relative;
+      }
+
+      .ui-border-corner::before,
+      .ui-border-corner::after {
+        content: '';
+        position: absolute;
+        border: 2px solid var(--green);
+        width: 36px;
+        height: 18px;
+        box-shadow: var(--shadow-glow);
+      }
+      .ui-border-corner::before {
+        top: -2px;
+        left: -2px;
+        border-right: 0;
+        border-bottom: 0;
+        border-radius: var(--corner);
+      }
+      .ui-border-corner::after {
+        bottom: -2px;
+        right: -2px;
+        border-left: 0;
+        border-top: 0;
+        border-radius: var(--corner);
+      }
+
+      /* Hero */
+      .hero-grid {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 24px;
+      }
+      @media (max-width: 800px) {
+        .hero-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .avatar-wrap {
+        position: relative;
+        border-radius: var(--radius);
+        overflow: hidden;
+        box-shadow: var(--shadow-glow);
+      }
+      .avatar {
+        width: 100%;
+        display: block;
+        filter: grayscale(100%) contrast(1.2) brightness(0.75);
+      }
+      .scanlines {
+        position: absolute;
+        inset: 0;
+        background: var(--scanlines);
+        animation: scrollLines 8s linear infinite;
+        opacity: 0.4;
+        pointer-events: none;
+      }
+      @keyframes scrollLines {
+        from {
+          background-position-y: 0;
+        }
+        to {
+          background-position-y: 100%;
+        }
+      }
+
+      .title {
+        margin: 0 0 8px 0;
+        font-size: clamp(28px, 3.2vw, 44px);
+        letter-spacing: 2px;
+      }
+      .subtitle {
+        color: var(--green-soft);
+        margin: 0 0 8px 0;
+      }
+      .meta {
+        opacity: 0.85;
+        font-size: 14px;
+      }
+
+      .hero-actions {
+        margin-top: 16px;
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .btn {
+        display: inline-block;
+        padding: 10px 14px;
+        border-radius: 4px;
+        text-decoration: none;
+        color: var(--text);
+        border: 1px solid rgba(0, 255, 65, 0.35);
+        background: rgba(17, 24, 39, 0.3);
+      }
+      .btn:hover,
+      .btn:focus-visible {
+        box-shadow: var(--shadow-glow);
+        color: var(--green-soft);
+      }
+      .btn-primary {
+        border-color: var(--green);
+        background: linear-gradient(
+          180deg,
+          rgba(0, 255, 65, 0.18),
+          rgba(0, 255, 65, 0.08)
+        );
+      }
+      .btn-ghost {
+        border-color: rgba(0, 255, 65, 0.25);
+      }
+
+      /* Cards */
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+      }
+      @media (max-width: 960px) {
+        .cards {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+      @media (max-width: 640px) {
+        .cards {
+          grid-template-columns: 1fr;
+        }
+      }
+      .card {
+        padding: 16px;
+        background: rgba(17, 24, 39, 0.45);
+        position: relative;
+      }
+      .card-t {
+        margin: 0;
+        font-size: 18px;
+      }
+      .card-b {
+        color: var(--green-soft);
+        margin: 0 0 10px 0;
+      }
+      .card-f {
+        display: flex;
+        gap: 16px;
+      }
+      .text-link {
+        color: var(--text);
+        text-decoration: none;
+      }
+      .text-link:hover {
+        color: var(--green-soft);
+        text-shadow: var(--shadow-glow);
+      }
+
+      /* Accordion */
+      .acc {
+        background: rgba(17, 24, 39, 0.45);
+        padding: 10px 12px;
+        border-radius: 4px;
+        margin-bottom: 10px;
+      }
+      .acc[open] .caret {
+        transform: rotate(180deg);
+      }
+      .acc-sum {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+        user-select: none;
+      }
+      .acc-sum::-webkit-details-marker {
+        display: none;
+      }
+      .acc-panel {
+        margin-top: 8px;
+      }
+      .tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 0;
+        margin: 0;
+        list-style: none;
+      }
+      .tags li {
+        border: 1px solid rgba(0, 255, 65, 0.35);
+        padding: 4px 8px;
+        border-radius: 3px;
+        background: rgba(7, 10, 18, 0.4);
+      }
+
+      /* Form */
+      .form {
+        display: grid;
+        gap: 14px;
+      }
+      .field {
+        display: grid;
+        gap: 6px;
+      }
+      .field span {
+        color: var(--green-soft);
+        font-size: 14px;
+      }
+      input,
+      textarea {
+        width: 100%;
+        color: var(--text);
+        background: rgba(7, 10, 18, 0.5);
+        border: 1px solid rgba(0, 255, 65, 0.35);
+        border-radius: 4px;
+        padding: 10px 12px;
+        outline: none;
+      }
+      input:focus,
+      textarea:focus {
+        box-shadow: var(--shadow-glow);
+      }
+      .form-actions {
+        display: flex;
+        gap: 10px;
+      }
+
+      /* Footer */
+      .site-footer {
+        width: min(1200px, 92vw);
+        margin: 24px auto 80px;
+        color: var(--green-soft);
+        opacity: 0.9;
+      }
+
+      /* Flicker */
+      .flicker {
+        animation: flicker 3.2s infinite steps(60);
+      }
+      @keyframes flicker {
+        0% {
+          opacity: 1;
+          text-shadow: var(--shadow-glow);
+        }
+        2% {
+          opacity: 0.85;
+        }
+        4% {
+          opacity: 1;
+        }
+        8% {
+          opacity: 0.9;
+        }
+        10% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+
+      /* Scrollbar */
+      * {
+        scrollbar-width: thin;
+        scrollbar-color: rgba(0, 255, 65, 0.6) rgba(17, 24, 39, 0.6);
+      }
+      *::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+      }
+      *::-webkit-scrollbar-track {
+        background: var(--bg-med);
+      }
+      *::-webkit-scrollbar-thumb {
+        background: rgba(0, 255, 65, 0.6);
+        box-shadow: var(--shadow-glow);
+        border-radius: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Matrix Rain -->
+    <canvas id="matrix-rain" aria-hidden="true"></canvas>
+
+    <!-- Screen scanline overlay -->
+    <div class="screen-overlay" aria-hidden="true"></div>
+
+    <!-- Bootup overlay -->
+    <div id="boot" class="boot">
+      <div class="boot-inner">
+        <pre id="boot-log" class="boot-log" aria-live="polite"></pre>
+        <div class="boot-progress"><div class="bar"></div></div>
+      </div>
+    </div>
+
+    <!-- Header / Nav -->
+    <header class="site-header">
+      <a href="#hero" class="logo flicker">// AGENT_404</a>
+      <nav class="site-nav">
+        <a class="nav-link" href="#projects">PROJECTS</a>
+        <a class="nav-link" href="#skills">SKILLS</a>
+        <a class="nav-link" href="#contact">CONTACT</a>
+      </nav>
+    </header>
+
+    <main id="hero" class="content">
+      <!-- Hero -->
+      <section class="section hero ui-panel ui-border-corner">
+        <div class="hero-grid">
+          <div class="hero-media">
+            <div class="avatar-wrap">
+              <img
+                src="https://images.unsplash.com/photo-1527980965255-d3b416303d12?q=80&w=600&auto=format&fit=crop"
+                alt="Profile portrait"
+                class="avatar"
+              />
+              <div class="scanlines"></div>
+            </div>
+          </div>
+          <div class="hero-text">
+            <h1 class="title flicker">// ACCESS_GRANTED</h1>
+            <p class="subtitle">
+              Monospace operator crafting secure, high-performance interfaces.
+            </p>
+            <p class="meta">// location: earth // status: online</p>
+            <div class="hero-actions">
+              <a href="#projects" class="btn btn-primary">> View Projects</a>
+              <a href="#contact" class="btn btn-ghost">> Contact</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Projects -->
+      <section id="projects" class="section ui-panel ui-border-corner">
+        <h2 class="section-title">PROJECTS</h2>
+        <div class="cards">
+          <article class="card ui-border-corner">
+            <h3 class="card-t">// Sentinel Dashboard</h3>
+            <p class="card-b">
+              Real-time telemetry HUD with WebGL particle viz and WebSocket
+              streams.
+            </p>
+          </article>
+          <article class="card ui-border-corner">
+            <h3 class="card-t">// BlackICE</h3>
+            <p class="card-b">Static analysis toolkit with WASM AST parsing.</p>
+          </article>
+          <article class="card ui-border-corner">
+            <h3 class="card-t">// Netrunner</h3>
+            <p class="card-b">
+              Offline-first PWA for incident response with encrypted sync.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <!-- Skills -->
+      <section id="skills" class="section ui-panel ui-border-corner">
+        <h2 class="section-title">SKILLS</h2>
+        <details class="acc" open>
+          <summary class="acc-sum">// Frontend <span class="caret">▼</span></summary>
+          <div class="acc-panel"><ul class="tags"><li>TypeScript</li><li>React</li></ul></div>
+        </details>
+      </section>
+
+      <!-- Contact -->
+      <section id="contact" class="section ui-panel ui-border-corner">
+        <h2 class="section-title">CONTACT</h2>
+        <form class="form">
+          <label class="field">
+            <span>// name</span>
+            <input type="text" />
+          </label>
+          <label class="field">
+            <span>// email</span>
+            <input type="email" />
+          </label>
+          <label class="field">
+            <span>// message</span>
+            <textarea></textarea>
+          </label>
+          <div class="form-actions">
+            <button class="btn btn-primary" type="submit">>> transmit</button>
+            <button class="btn btn-ghost" type="reset">>> purge</button>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>// © <span id="year"></span> AGENT_404 :: systems nominal</p>
+    </footer>
+
+    <script>
+      const BOOT_LINES = [
+        '[BOOT] Initializing CRT subsystem...',
+        '[OK] Video driver loaded',
+        '[OK] Matrix emitter online',
+        '[OK] Entropy pool seeded',
+        '[AUTH] Handshake…',
+        '[GRANT] ACCESS_GRANTED',
+      ];
+      const $ = (q) => document.querySelector(q);
+      function typeLines(node, lines, cb) {
+        let i = 0;
+        function next() {
+          if (i >= lines.length) return cb?.();
+          typeLine(node, lines[i++], next);
+        }
+        next();
+      }
+      function typeLine(node, text, done) {
+        let idx = 0;
+        const iv = setInterval(() => {
+          node.textContent += text[idx++];
+          if (idx < text.length) return;
+          clearInterval(iv);
+          node.textContent += '\\n';
+          done?.();
+        }, 30);
+      }
+      function progressTo(el, pct, ms) {
+        const start = performance.now();
+        const init = parseFloat(el.style.width) || 0;
+        const delta = pct - init;
+        function frame(t) {
+          const k = Math.min(1, (t - start) / ms);
+          el.style.width = `${(init + delta * k).toFixed(2)}%`;
+          if (k < 1) requestAnimationFrame(frame);
+        }
+        requestAnimationFrame(frame);
+      }
+      window.addEventListener('load', () => {
+        $('#year').textContent = new Date().getFullYear();
+        const boot = $('#boot');
+        const log = $('#boot-log');
+        const bar = document.querySelector('.boot-progress .bar');
+        if (sessionStorage.getItem('booted')) {
+          boot.remove();
+        } else {
+          typeLines(log, BOOT_LINES, () => {
+            progressTo(bar, 100, 250);
+            setTimeout(() => boot.remove(), 400);
+            sessionStorage.setItem('booted', '1');
+          });
+        }
+        initMatrixRain();
+      });
+
+      function initMatrixRain() {
+        const canvas = document.getElementById('matrix-rain');
+        const ctx = canvas.getContext('2d');
+        const chars =
+          'アカサタナハマヤラワ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ<>[]{}()+-*/=';
+        const glyphs = chars.split('');
+        let w, h, cols, drops, fontSize;
+        function resize() {
+          w = canvas.width = window.innerWidth;
+          h = canvas.height = window.innerHeight;
+          fontSize = Math.max(14, Math.floor(w / 90));
+          cols = Math.floor(w / fontSize);
+          drops = Array(cols).fill(0);
+        }
+        function draw() {
+          ctx.fillStyle = 'rgba(3,5,10,0.08)';
+          ctx.fillRect(0, 0, w, h);
+          ctx.fillStyle = '#00ff41';
+          ctx.font = fontSize + "px 'Roboto Mono', monospace";
+          for (let i = 0; i < drops.length; i++) {
+            const text = glyphs[Math.floor(Math.random() * glyphs.length)];
+            const x = i * fontSize;
+            const y = drops[i] * fontSize;
+            ctx.shadowColor = 'rgba(0,255,65,0.65)';
+            ctx.shadowBlur = 8;
+            ctx.fillText(text, x, y);
+            if (y > h && Math.random() > 0.975) drops[i] = 0;
+            else drops[i]++;
+          }
+          requestAnimationFrame(draw);
+        }
+        window.addEventListener('resize', resize);
+        resize();
+        draw();
+      }
+    </script>
+  </body>
+</html>

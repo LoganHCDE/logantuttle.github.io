@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+    <title>LT</title>
+    <!-- Background circle for better visibility on all backgrounds -->
+    <circle cx="32" cy="32" r="32" fill="#0a1220"/>
+    <!-- Blue circle frame -->
+    <circle cx="32" cy="32" r="29" stroke="#003fff" stroke-width="2.4" fill="none"/>
+    <!-- LT monogram centered -->
+    <g transform="translate(-5,0)" stroke="#003fff" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 22 V42 H36"/>
+        <path d="M42 22 H56 M49 22 V42"/>
+    </g>
+</svg>

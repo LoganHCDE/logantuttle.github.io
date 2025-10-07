@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- Root Variables --- */
+        :root {
+            --color-bg: #000510;
+            --color-bg-lighter: #0a1220;
+            --color-primary: #00a3ff;
+            --color-primary-bright: #50aaff;
+            --color-accent: #00ffaa;
+            --color-text: #e8f1ff;
+            --color-text-dim: #8ea3c0;
+            --color-border: rgba(0,163,255,0.3);
+            --color-glow: rgba(0,163,255,0.4);
+        }
+
+        /* --- Basic Setup --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden;
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        body {
+            background: linear-gradient(135deg, 
+                #000510 0%, 
+                #001430 25%, 
+                #000a18 50%, 
+                #001845 75%, 
+                #000510 100%);
+            background-attachment: fixed;
+            color: var(--color-text);
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* --- Matrix Rain Canvas --- */
+        #matrix-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.15;
+        }
+
+        /* --- Navigation Bar --- */
+        .navbar {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            padding: 16px 32px;
+            background: linear-gradient(135deg, rgba(10,18,32,0.95) 0%, rgba(0,20,48,0.92) 100%);
+            border: 2px solid rgba(0,163,255,0.3);
+            border-radius: 50px;
+            box-shadow: 0 0 30px rgba(0,163,255,0.2), 0 4px 20px rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            max-width: 95%;
+            width: max-content;
+        }
+
+        .navbar:hover {
+            box-shadow: 0 0 40px rgba(0,163,255,0.35), 0 6px 25px rgba(0,0,0,0.6);
+            border-color: rgba(0,163,255,0.5);
+        }
+
+        .nav-brand {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #003fff;
+            text-decoration: none;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-brand:hover {
+            color: var(--color-accent);
+            transform: translateY(-2px);
+        }
+
+        /* Custom LT monogram logo styling */
+        .nav-brand .lt-logo { 
+            width: 34px; 
+            height: 34px; 
+            display: block; 
+        }
+        .nav-brand .lt-logo g { 
+            stroke-linecap: round; 
+            stroke-linejoin: round; 
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--color-text);
+            text-decoration: none;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            padding: 8px 12px;
+            border-radius: 8px;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--color-accent);
+            background: rgba(0,163,255,0.1);
+            transform: translateY(-2px);
+        }
+
+        .external-link-icon {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            margin-left: 1px;
+            opacity: 1;
+            transition: all 0.3s ease;
+            vertical-align: middle;
+        }
+
+        .nav-links a:hover .external-link-icon {
+            transform: translate(2px, -2px);
+        }
+
+        /* --- Main Content Wrapper --- */
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
+            max-width: 1100px;
+            margin: 120px auto 60px;
+            padding: 0 40px;
+        }
+
+        /* --- Download Button --- */
+        .download-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 32px;
+            background: linear-gradient(135deg, rgba(0,163,255,0.2) 0%, rgba(0,255,170,0.2) 100%);
+            border: 2px solid var(--color-primary);
+            border-radius: 12px;
+            color: var(--color-text);
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-decoration: none;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(0,163,255,0.3);
+        }
+
+        .download-btn:hover {
+            background: linear-gradient(135deg, rgba(0,163,255,0.4) 0%, rgba(0,255,170,0.4) 100%);
+            box-shadow: 0 0 35px rgba(0,163,255,0.6);
+            transform: translateY(-3px);
+            border-color: var(--color-accent);
+        }
+
+        .download-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* --- Resume Container --- */
+        .resume-container {
+            background: linear-gradient(135deg, rgba(10,18,32,0.95) 0%, rgba(0,20,48,0.92) 100%);
+            border: 2px solid rgba(0,163,255,0.3);
+            border-radius: 16px;
+            padding: 50px 60px;
+            box-shadow: 0 0 40px rgba(0,163,255,0.2), 0 8px 32px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        .resume-container::before {
+            content: '';
+            position: absolute;
+            inset: 6px;
+            border: 1px solid rgba(0,163,255,0.15);
+            border-radius: 14px;
+            pointer-events: none;
+        }
+
+        /* --- Resume Header --- */
+        .resume-header {
+            text-align: center;
+            border-bottom: 2px solid rgba(0,163,255,0.3);
+            padding-bottom: 30px;
+            margin-bottom: 40px;
+        }
+
+        .resume-header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--color-primary-bright);
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(0,163,255,0.6);
+        }
+
+        .resume-header .title {
+            font-size: 1.3rem;
+            color: var(--color-accent);
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .contact-info {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .contact-info-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--color-text-dim);
+            font-size: 0.9rem;
+        }
+
+        .contact-info-item a {
+            color: var(--color-primary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .contact-info-item a:hover {
+            color: var(--color-accent);
+        }
+
+        /* --- Resume Sections --- */
+        .resume-section {
+            margin-bottom: 50px;
+        }
+
+        .resume-section h2 {
+            font-size: 1.8rem;
+            color: var(--color-primary-bright);
+            letter-spacing: 2px;
+            margin-bottom: 25px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid rgba(0,163,255,0.3);
+            text-transform: uppercase;
+            text-shadow: 0 0 15px rgba(0,163,255,0.5);
+        }
+
+        /* --- Profile Section --- */
+        .profile-text {
+            font-size: 1rem;
+            line-height: 1.8;
+            color: var(--color-text);
+            margin-bottom: 15px;
+        }
+
+        /* --- Experience Section --- */
+        .experience-item,
+        .education-item {
+            margin-bottom: 35px;
+            padding-left: 20px;
+            border-left: 3px solid rgba(0,163,255,0.4);
+        }
+
+        .experience-header,
+        .education-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .job-title,
+        .degree-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--color-accent);
+            letter-spacing: 1px;
+        }
+
+        .company,
+        .school {
+            font-size: 1.1rem;
+            color: var(--color-primary);
+            margin-bottom: 5px;
+        }
+
+        .date-range {
+            font-size: 0.9rem;
+            color: var(--color-text-dim);
+            letter-spacing: 1px;
+        }
+
+        .experience-description,
+        .education-description {
+            margin-top: 12px;
+        }
+
+        .experience-description ul,
+        .education-description ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .experience-description li,
+        .education-description li {
+            position: relative;
+            padding-left: 25px;
+            margin-bottom: 10px;
+            line-height: 1.6;
+            color: var(--color-text);
+        }
+
+        .experience-description li::before,
+        .education-description li::before {
+            content: '▹';
+            position: absolute;
+            left: 0;
+            color: var(--color-accent);
+            font-size: 1.2rem;
+        }
+
+        /* --- Skills Section --- */
+        .skills-grid {
+            display: grid;
+            /* Two columns on desktop, single column will be enforced for small screens via media query */
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+        }
+
+        .skill-category {
+            background: rgba(0,163,255,0.05);
+            border: 1px solid rgba(0,163,255,0.2);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .skill-category:hover {
+            background: rgba(0,163,255,0.1);
+            border-color: rgba(0,163,255,0.4);
+            box-shadow: 0 0 20px rgba(0,163,255,0.2);
+        }
+
+        .skill-category h3 {
+            font-size: 1.2rem;
+            color: var(--color-primary-bright);
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .skill-list {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .skill-tag {
+            display: inline-block;
+            padding: 6px 14px;
+            background: rgba(0,163,255,0.15);
+            border: 1px solid rgba(0,163,255,0.3);
+            border-radius: 20px;
+            color: var(--color-text);
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .skill-tag:hover {
+            background: rgba(0,255,170,0.15);
+            border-color: var(--color-accent);
+            color: var(--color-accent);
+            transform: translateY(-2px);
+        }
+
+        /* --- Projects Section --- */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+        }
+
+        .project-card {
+            background: rgba(0,163,255,0.05);
+            border: 2px solid rgba(0,163,255,0.3);
+            border-radius: 12px;
+            padding: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .project-card:hover {
+            background: rgba(0,163,255,0.1);
+            border-color: var(--color-accent);
+            box-shadow: 0 0 25px rgba(0,163,255,0.3);
+            transform: translateY(-5px);
+        }
+
+        .project-card h3 {
+            font-size: 1.3rem;
+            color: var(--color-accent);
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .project-card .project-type {
+            font-size: 0.85rem;
+            color: var(--color-primary);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .project-card p {
+            color: var(--color-text);
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        /* --- Responsive Design --- */
+        
+        /* Medium screens: adjust navbar layout */
+        @media (max-width: 1024px) {
+            .navbar {
+                gap: 16px;
+                padding: 12px 24px;
+            }
+
+            .nav-brand {
+                font-size: 1rem;
+            }
+
+            .nav-links {
+                gap: 12px;
+            }
+
+            .nav-links a {
+                font-size: 0.85rem;
+                padding: 6px 10px;
+            }
+        }
+
+        /* Smaller screens: wrap navbar into two rows */
+        @media (max-width: 900px) {
+            .navbar {
+                flex-wrap: wrap;
+                justify-content: center;
+                padding: 14px 20px;
+                gap: 12px;
+            }
+
+            .nav-brand {
+                width: 100%;
+                justify-content: center;
+                margin-bottom: 6px;
+            }
+
+            .nav-links {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 8px;
+            }
+
+            .nav-links a {
+                font-size: 0.8rem;
+                padding: 6px 10px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .content-wrapper {
+                margin: 160px auto 40px;
+                padding: 0 20px;
+            }
+
+            .resume-container {
+                padding: 30px 25px;
+            }
+
+            .resume-header h1 {
+                font-size: 2rem;
+            }
+
+            .resume-header .title {
+                font-size: 1rem;
+            }
+
+            .contact-info {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .experience-header,
+            .education-header {
+                flex-direction: column;
+            }
+
+            /* Ensure skills display as a single column on small screens */
+            .skills-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Mobile screens: more compact navbar */
+        @media (max-width: 600px) {
+            .navbar {
+                top: 10px;
+                padding: 12px 16px;
+                gap: 10px;
+                width: 95%;
+            }
+
+            .nav-brand {
+                font-size: 0.9rem;
+                letter-spacing: 1px;
+            }
+
+            .nav-brand .lt-logo {
+                width: 28px;
+                height: 28px;
+            }
+
+            .nav-links {
+                gap: 6px;
+            }
+
+            .nav-links a {
+                font-size: 0.75rem;
+                padding: 5px 8px;
+                letter-spacing: 0.5px;
+            }
+
+            .external-link-icon {
+                width: 12px;
+                height: 12px;
+            }
+
+            .content-wrapper {
+                margin: 180px auto 40px;
+                padding: 0 15px;
+            }
+        }
+
+        /* Very small screens: ultra compact */
+        @media (max-width: 450px) {
+            .navbar {
+                padding: 10px 12px;
+            }
+
+            .nav-brand {
+                font-size: 0.85rem;
+            }
+
+            .nav-links a {
+                font-size: 0.7rem;
+                padding: 4px 6px;
+            }
+
+            .content-wrapper {
+                margin: 200px auto 40px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Matrix Rain Canvas -->
+    <canvas id="matrix-canvas"></canvas>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <a href="./" class="nav-brand">
+            <!-- Futuristic LT Monogram Logo -->
+            <svg class="lt-logo" width="34" height="34" viewBox="0 0 64 64" aria-hidden="true" role="img">
+                <title>LT Monogram</title>
+                <!-- Single-color circle and letters (no glow) -->
+                <circle cx="32" cy="32" r="29" stroke="#003fff" stroke-width="2.4" fill="none" />
+                <g transform="translate(-5,0)" stroke="#003fff" stroke-width="4" fill="none" class="logo-stroke" stroke-linecap="round" stroke-linejoin="round">
+                    <!-- visually nudged left -5px for optical centering -->
+                    <path d="M22 22 V42 H36" />
+                    <path d="M42 22 H56 M49 22 V42" />
+                </g>
+            </svg>
+            Logan Tuttle.org
+        </a>
+        <ul class="nav-links">
+            <li><a href="./#profile">Profile</a></li>
+            <li><a href="./#projects">Projects</a></li>
+            <li><a href="./#skills">Skills</a></li>
+            <li><a href="./#contact">Contact</a></li>
+            <li><a href="/resume" class="active">Resume</a></li>
+            <li><a href="https://www.linkedin.com/in/uw-logan-tuttle/" target="_blank">
+                LinkedIn
+                <svg class="external-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="7" y1="17" x2="17" y2="7"></line>
+                    <polyline points="7 7 17 7 17 17"></polyline>
+                </svg>
+            </a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="content-wrapper">
+        <!-- Download Button -->
+        <div class="download-section">
+            <a href="Logan Tuttle UX Resume.pdf" download class="download-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                Download PDF Resume
+            </a>
+        </div>
+
+        <!-- Resume Container -->
+        <div class="resume-container">
+            <!-- Header -->
+            <div class="resume-header">
+                <h1>LOGAN TUTTLE</h1>
+                <div class="title">Human Centered Design & Engineering Student</div>
+                <div class="title">UX Researcher & Designer</div>
+                <div class="contact-info">
+                    <div class="contact-info-item">
+                        <span>📧</span>
+                        <a href="mailto:Logan347@uw.edu">Logan347@uw.edu</a>
+                    </div>
+                    <div class="contact-info-item">
+                        <span>�</span>
+                        <a href="https://loganhcde.github.io" target="_blank">loganhcde.github.io</a>
+                    </div>
+                    <div class="contact-info-item">
+                        <span>🔗</span>
+                        <a href="https://www.linkedin.com/in/uw-logan-tuttle/" target="_blank">LinkedIn</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Summary -->
+            <div class="resume-section">
+                <h2>Profile</h2>
+                <p class="profile-text">
+                    Human Centered Design & Engineering student at University of Washington with a strong foundation in 
+                    UX research, product design, and front-end development. Passionate about creating accessible, 
+                    user-centered solutions through iterative design and evidence-based research. Experienced in 
+                    qualitative research, usability testing, prototyping, and data analysis.
+                </p>
+            </div>
+
+            <!-- Education -->
+            <div class="resume-section">
+                <h2>Education</h2>
+                <div class="education-item">
+                    <div class="education-header">
+                        <div>
+                            <div class="degree-title">Bachelor of Science in Human Centered Design and Engineering</div>
+                            <div class="school">University of Washington, Seattle, WA</div>
+                        </div>
+                        <div class="date-range">September 2023 - June 2026</div>
+                    </div>
+                    <div class="education-description">
+                        <ul>
+                            <li>GPA: 3.7</li>
+                            <li>Minor in Data Science</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Experience -->
+            <div class="resume-section">
+                <h2>Experience</h2>
+                
+                <div class="experience-item">
+                    <div class="experience-header">
+                        <div>
+                            <div class="job-title">Vega Chart</div>
+                            <div class="company">Seattle, WA</div>
+                        </div>
+                        <div class="date-range">August 2025 - September 2025</div>
+                    </div>
+                    <div class="experience-description">
+                        <ul>
+                            <li>Designed an accessible, dark-mode interface with intuitive controls for chart generation.</li>
+                            <li>Implemented structured workflows for users to upload datasets and configure charts.</li>
+                            <li>Engineered the interactive chart builder with Tailwind CSS and JavaScript.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="experience-item">
+                    <div class="experience-header">
+                        <div>
+                            <div class="job-title">HCI Research Assistant</div>
+                            <div class="company">UW Center for Informed Public</div>
+                        </div>
+                        <div class="date-range">June 2024 - December 2024</div>
+                    </div>
+                    <div class="experience-description">
+                        <ul>
+                            <li>Conducted discovery research on election-related social media to uncover behaviors and sentiment.</li>
+                            <li>Used monitoring tools to track misinformation patterns across X and TikTok.</li>
+                            <li>Coded and analyzed visual content on immigration discourse, providing insights into user engagement.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="experience-item">
+                    <div class="experience-header">
+                        <div>
+                            <div class="job-title">HCI Research Assistant</div>
+                            <div class="company">HCDE Department</div>
+                        </div>
+                        <div class="date-range">January 2024 - June 2024</div>
+                    </div>
+                    <div class="experience-description">
+                        <ul>
+                            <li>Created and applied a qualitative codebook; analyzed 350+ immigration-related social media posts.</li>
+                            <li>Conducted diary studies/interviews on long-distance gaming habits.</li>
+                            <li>Prototyped a desktop app for couples to save and share gaming memories.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Skills -->
+            <div class="resume-section">
+                <h2>Skills</h2>
+                <div class="skills-grid">
+                    <div class="skill-category">
+                        <h3>UX & Product Design</h3>
+                        <div class="skill-list">
+                            <span class="skill-tag">Wireframing & Prototyping (Figma)</span>
+                            <span class="skill-tag">Design Systems & Component Libraries</span>
+                            <span class="skill-tag">Accessible & Inclusive Design (WCAG 2.1)</span>
+                            <span class="skill-tag">User Flows</span>
+                            <span class="skill-tag">High-Fidelity Mockups & Interaction Design</span>
+                        </div>
+                    </div>
+                    <div class="skill-category">
+                        <h3>UX Research</h3>
+                        <div class="skill-list">
+                            <span class="skill-tag">User Interviews & Field Research</span>
+                            <span class="skill-tag">Usability Testing, Card Sorting, Tree Testing</span>
+                            <span class="skill-tag">Affinity Diagramming & Thematic Analysis</span>
+                            <span class="skill-tag">Journey Mapping & Persona Development</span>
+                        </div>
+                    </div>
+                    <div class="skill-category">
+                        <h3>Data & Analytics</h3>
+                        <div class="skill-list">
+                            <span class="skill-tag">Python</span>
+                            <span class="skill-tag">R</span>
+                            <span class="skill-tag">SQL</span>
+                            <span class="skill-tag">Excel</span>
+                            <span class="skill-tag">Google Analytics</span>
+                            <span class="skill-tag">Data Visualization</span>
+                            <span class="skill-tag">A/B Testing & Survey Design</span>
+                        </div>
+                    </div>
+                    <div class="skill-category">
+                        <h3>Front End Development</h3>
+                        <div class="skill-list">
+                            <span class="skill-tag">HTML</span>
+                            <span class="skill-tag">CSS</span>
+                            <span class="skill-tag">JavaScript</span>
+                            <span class="skill-tag">TypeScript</span>
+                            <span class="skill-tag">React</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Projects -->
+            <div class="resume-section">
+                <h2>Selected Academic Projects</h2>
+                <div class="projects-grid">
+                    <div class="project-card">
+                        <h3>Light Rail Usability Study</h3>
+                        <div class="project-type">UX Research / Design</div>
+                        <p>
+                            Conducted surveys, field research, and interviews to identify ticketing pain points; 
+                            produced design recommendations to improve user experience at kiosks.
+                        </p>
+                    </div>
+                    <div class="project-card">
+                        <h3>Sustainable Smart Sprinkler App</h3>
+                        <div class="project-type">UX Research / Prototyping</div>
+                        <p>
+                            Led UX research and translated insights into wireframes and interactive prototypes 
+                            focused on sustainability and usability.
+                        </p>
+                    </div>
+                    <div class="project-card">
+                        <h3>AI Captioner Discord - Tavlo.app</h3>
+                        <div class="project-type">Web Development</div>
+                        <p>
+                            Built and launched a web app launcher for an integrated Discord bot that utilizes AI 
+                            to create image captions and AI summaries.
+                        </p>
+                    </div>
+                    <div class="project-card">
+                        <h3>Battery Replacement Interface Prototype</h3>
+                        <div class="project-type">UX Design / Physical Prototyping</div>
+                        <p>
+                            Developed a UI and physical prototype for an incentivized battery recycling kiosk, 
+                            leveraging Figma, 3D printing, and laser cutting to bring the concept to life.
+                        </p>
+                    </div>
+                    <!-- Local Restaurant project removed per request -->
+                </div>
+            </div>
+
+            <!-- Publications -->
+            <div class="resume-section">
+                <h2>Publications</h2>
+                <div class="experience-item">
+                    <div class="experience-header">
+                        <div>
+                            <div class="job-title">Partnership through Play: Investigating How Long-Distance Couples Use Digital Games to Facilitate Intimacy</div>
+                        </div>
+                    </div>
+                    <div class="experience-description">
+                        <ul>
+                            <li>Published research examining the role of digital games in maintaining intimacy for long-distance couples</li>
+                            <li>DOI: <a href="https://doi.org/10.1145/3715336.3735773" target="_blank" style="color: var(--color-primary); text-decoration: none;">10.1145/3715336.3735773</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Matrix Rain Animation Script -->
+    <script>
+        // Matrix Rain Effect
+        const canvas = document.getElementById('matrix-canvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const matrixChars = '0101010101';
+        const fontSize = 14;
+        const columns = canvas.width / fontSize;
+        const drops = [];
+
+        for (let i = 0; i < columns; i++) {
+            drops[i] = Math.random() * -100;
+        }
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(0, 5, 16, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#00a3ff';
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = matrixChars.charAt(Math.floor(Math.random() * matrixChars.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(drawMatrix, 35);
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // Smooth scroll for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
