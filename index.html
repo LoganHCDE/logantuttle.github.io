@@ -373,7 +373,7 @@
             /* Use viewport height so the canvas consistently covers the
                visible area while scrolling. The canvas is fixed so it will
                remain visible behind content as the page scrolls. */
-            height: 100vh;
+            height: calc(var(--vh, 1vh) * 100);
             z-index: -10; /* Ensure it's behind everything */
             opacity: 0.3; /* Make it more of a background element */
             pointer-events: none; /* Let clicks pass through to the page */
@@ -2701,6 +2701,22 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // --- Viewport Height Fix for Mobile ---
+            // This captures the initial, stable viewport height and stores it in a CSS variable.
+            // This prevents layout shifts on mobile when the browser UI (like the address bar)
+            // appears or disappears, which would otherwise change the value of '100vh'.
+            const setStableViewportHeight = () => {
+                let vh = window.innerHeight * 0.01;
+                document.documentElement.style.setProperty('--vh', `${vh}px`);
+            };
+
+            // Set the value on initial load
+            setStableViewportHeight();
+
+            // Also reset it on resize or orientation change to handle device rotation
+            window.addEventListener('resize', setStableViewportHeight);
+            window.addEventListener('orientationchange', setStableViewportHeight);
+            
             const root = document.documentElement;
             const layoutRoot = document.getElementById('layout-root');
             const layoutWrapper = layoutRoot ? layoutRoot.parentElement : null;
