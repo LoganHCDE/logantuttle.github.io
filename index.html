@@ -2720,11 +2720,18 @@
                     const gap = layoutRoot.scrollHeight * (1 - scale);
                     root.style.setProperty('--scale-gap', `${Math.max(0, gap).toFixed(2)}px`);
                 };
+                let resizeScheduled = false;
                 const scheduleScaleUpdate = () => {
+                    if (resizeScheduled) return;
+                    resizeScheduled = true;
                     if (typeof requestAnimationFrame === 'function') {
-                        requestAnimationFrame(updateScale);
+                        requestAnimationFrame(() => {
+                            updateScale();
+                            resizeScheduled = false;
+                        });
                     } else {
                         updateScale();
+                        resizeScheduled = false;
                     }
                 };
                 updateScale();
