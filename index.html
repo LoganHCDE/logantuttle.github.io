@@ -3755,22 +3755,6 @@
                 }
             }
 
-            // Ensure the projects grid width matches the ID card container's computed width
-            const projectsGrid = document.querySelector('.projects-grid');
-            const idCardContainer = document.querySelector('.id-card-container');
-            function syncProjectsGridWidth() {
-                if (!projectsGrid || !idCardContainer) return;
-                const w = idCardContainer.getBoundingClientRect().width;
-                // ensure grid doesn't exceed site container (use site-width wrapper if present)
-                const siteWrapper = document.querySelector('.site-width');
-                const maxW = siteWrapper ? siteWrapper.getBoundingClientRect().width : w;
-                projectsGrid.style.width = Math.min(w, maxW) + 'px';
-                projectsGrid.style.margin = '0 auto';
-            }
-            // run once and on resize to keep alignment exact
-            syncProjectsGridWidth();
-            window.addEventListener('resize', syncProjectsGridWidth);
-
             // Resize handling
             function onResize() {
                 const w = root.clientWidth;
