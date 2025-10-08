@@ -2722,45 +2722,77 @@
             const layoutWrapper = layoutRoot ? layoutRoot.parentElement : null;
             if (layoutRoot) {
                 const baseWidth = parseFloat(layoutRoot.dataset.designWidth || layoutRoot.scrollWidth);
+                let lastWidth = 0; // Track last measured width to prevent unnecessary updates
+                
                 const measureAvailableWidth = () => {
                     if (layoutWrapper) {
                         return Math.max(layoutWrapper.clientWidth, 240);
                     }
                     return Math.max(window.innerWidth, 240);
                 };
+                
                 const updateScale = () => {
                     const availableWidth = measureAvailableWidth();
+                    
+                    // Only update if width actually changed (prevent updates on scroll/height changes)
+                    if (Math.abs(availableWidth - lastWidth) < 1) {
+                        return;
+                    }
+                    lastWidth = availableWidth;
+                    
                     const scale = Math.min(1, availableWidth / baseWidth);
                     root.style.setProperty('--page-scale', scale.toFixed(4));
                     root.style.setProperty('--layout-height', `${(layoutRoot.scrollHeight * scale).toFixed(2)}px`);
                     const gap = layoutRoot.scrollHeight * (1 - scale);
                     root.style.setProperty('--scale-gap', `${Math.max(0, gap).toFixed(2)}px`);
                 };
+                
                 let resizeScheduled = false;
+                let resizeTimeout = null;
+                
                 const scheduleScaleUpdate = () => {
                     if (resizeScheduled) return;
                     resizeScheduled = true;
-                    if (typeof requestAnimationFrame === 'function') {
-                        requestAnimationFrame(() => {
+                    
+                    // Clear any pending timeout
+                    if (resizeTimeout) {
+                        clearTimeout(resizeTimeout);
+                    }
+                    
+                    // Debounce: wait for resize to settle before updating
+                    resizeTimeout = setTimeout(() => {
+                        if (typeof requestAnimationFrame === 'function') {
+                            requestAnimationFrame(() => {
+                                updateScale();
+                                resizeScheduled = false;
+                            });
+                        } else {
                             updateScale();
                             resizeScheduled = false;
-                        });
-                    } else {
-                        updateScale();
-                        resizeScheduled = false;
-                    }
+                        }
+                    }, 150); // 150ms debounce to prevent rapid updates
                 };
+                
+                // Initial scale calculation
                 updateScale();
+                
+                // Only listen to actual window resize events (not scroll or content changes)
                 window.addEventListener('resize', scheduleScaleUpdate);
-                window.addEventListener('orientationchange', scheduleScaleUpdate);
-                if ('ResizeObserver' in window) {
-                    const resizeObserver = new ResizeObserver(() => scheduleScaleUpdate());
-                    resizeObserver.observe(layoutRoot);
-                    if (layoutWrapper) {
-                        resizeObserver.observe(layoutWrapper);
-                    }
-                }
-                window.addEventListener('load', scheduleScaleUpdate, { once: true });
+                window.addEventListener('orientationchange', () => {
+                    // Orientation change needs immediate handling
+                    setTimeout(() => {
+                        lastWidth = 0; // Force update on orientation change
+                        updateScale();
+                    }, 100);
+                });
+                
+                // Remove ResizeObserver that was causing the glitch on scroll/interaction
+                // The window resize listener is sufficient for responsive scaling
+                
+                window.addEventListener('load', () => {
+                    lastWidth = 0; // Force update on load
+                    updateScale();
+                }, { once: true });
             }
 
             // Skills accordion behavior
