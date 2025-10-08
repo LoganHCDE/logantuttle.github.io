@@ -1553,6 +1553,20 @@
                 font-size: 24px;
             }
 
+            /* On mobile, ensure project cards have a minimum height and proper layout */
+            .project-card {
+                min-height: 320px; /* Adjust as needed */
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start; /* Align content to the top */
+                width: 100%; /* Ensure card takes full width */
+                box-sizing: border-box; /* Include padding and border in the element's total width and height */
+            }
+
+            /* Adjust project details for better readability on mobile */
+            .project-details {
+                padding: 4px 2px 0 2px;
+            }
         }
 
         /* Blue neon boxed project card to match the attached aesthetic */
